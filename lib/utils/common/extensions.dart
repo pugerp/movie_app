@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../features/main/bloc/theme_bloc.dart';
 
 extension StringExtension on String {
   String hhMMFormat() {
@@ -13,4 +16,12 @@ extension StringExtension on String {
   String toMainPath() {
     return '/$this';
   }
+}
+
+extension ThemeStateX on ThemeState {
+  ThemeMode get themeMode => when(
+    initial: () => ThemeMode.system,
+    light: () => ThemeMode.light,
+    dark: () => ThemeMode.dark,
+  );
 }
