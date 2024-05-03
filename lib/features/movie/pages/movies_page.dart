@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -17,14 +20,13 @@ class MoviesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<MovieBloc>()..add(const MovieEvent.fetchMovie()),
-      child: BlocConsumer<MovieBloc, MovieState>(
-        listener: (context, state) {},
-        builder: (context, state) => _buildPage(context, state),
+      child: BlocBuilder<MovieBloc, MovieState>(
+        builder: (context, state) => buildPage(context, state),
       ),
     );
   }
 
-  _buildPage(BuildContext context, MovieState state) {
+  Widget buildPage(BuildContext context, MovieState state) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -83,7 +85,7 @@ class MoviesPage extends StatelessWidget {
         itemCount: movies.length,
       );
 
-  Widget movieItem(movie, onTap) {
+  Widget movieItem(Movie movie, onTap) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -94,20 +96,43 @@ class MoviesPage extends StatelessWidget {
             side: const BorderSide(width: 1, color: Colors.grey),
           ),
         ),
-        padding: const EdgeInsets.all(8),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              movie.title,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(4.r),
+                  bottomLeft: Radius.circular(4.r)),
+              child: Image.network(
+                'https://image.tmdb.org/t/p/original/${movie.posterPath}',
+                width: 80.w,
+                height: 100.w,
+                fit: BoxFit.fill,
+              ),
             ),
-            4.verticalSpace,
-            Text(
-              movie.overview,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            )
+            8.horizontalSpace,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      movie.title,
+                      style: TextStyle(
+                          fontSize: 16.sp, fontWeight: FontWeight.bold),
+                    ),
+                    4.verticalSpace,
+                    Text(
+                      movie.overview,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
