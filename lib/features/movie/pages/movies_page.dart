@@ -13,13 +13,19 @@ import 'package:movie_app/utils/common/extensions.dart';
 import '../../../data/models/movie/movie.dart';
 import '../../../root/injections.dart';
 
-class MoviesPage extends StatelessWidget {
-  const MoviesPage({super.key});
+class MoviesPage extends StatefulWidget {
+  MoviesPage({super.key});
 
+  @override
+  State<MoviesPage> createState() => _MoviesPageState();
+}
+
+class _MoviesPageState extends State<MoviesPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<MovieBloc>()..add(const MovieEvent.fetchMovie()),
+      create: (_) =>
+          sl<MovieBloc>()..add(const MovieEvent.fetchMovie(initial: true)),
       child: BlocBuilder<MovieBloc, MovieState>(
         builder: (context, state) => buildPage(context, state),
       ),
@@ -56,7 +62,9 @@ class MoviesPage extends StatelessWidget {
         body: state.when(
           initial: handleLoading,
           loading: handleLoading,
-          success: (movies, page) => handleSuccess(context, movies, page),
+          success: (movies, page) {
+            return handleSuccess(context, movies, page);
+          },
           error: handleError,
         ),
       ),
@@ -72,17 +80,34 @@ class MoviesPage extends StatelessWidget {
   Widget handleSuccess(BuildContext context, List<Movie> movies, int page) =>
       ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemBuilder: (context, index) => movieItem(
-          movies[index],
-          () {
-            context.goNamed(
-              AppRouter.movie_detail,
-              queryParams: {'movie_id': movies[index].movieId.toString()},
-            );
-          },
-        ),
+        itemBuilder: (context, index) => index < movies.length
+            ? movieItem(
+                movies[index],
+                () {
+                  context.goNamed(
+                    AppRouter.movie_detail,
+                    queryParams: {'movie_id': movies[index].movieId.toString()},
+                  );
+                },
+              )
+            : context.read<MovieBloc>().isLoadingLoadMore
+                ? const Center(child: CircularProgressIndicator())
+                : SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        context.read<MovieBloc>().add(MovieEvent.fetchMovie(
+                            initial: false,
+                            page: context.read<MovieBloc>().nextPage));
+                      },
+                      child: Text(
+                        'Load More',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
         separatorBuilder: (context, index) => 8.verticalSpace,
-        itemCount: movies.length,
+        itemCount: movies.length + 1,
       );
 
   Widget movieItem(Movie movie, onTap) {

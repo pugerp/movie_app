@@ -13,14 +13,14 @@ class MovieApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ThemeBloc>(),
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) {
-          return ScreenUtilInit(
-            minTextAdapt: true,
-            splitScreenMode: false,
-            child: MaterialApp.router(
+    return ScreenUtilInit(
+      minTextAdapt: true,
+      splitScreenMode: false,
+      child: BlocProvider(
+        create: (_) => sl<ThemeBloc>(),
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, state) {
+            return MaterialApp.router(
               title: 'Movie App',
               debugShowCheckedModeBanner: false,
               theme: DefaultTheme.light,
@@ -28,11 +28,12 @@ class MovieApp extends StatelessWidget {
               themeMode: state.themeMode,
               routeInformationProvider: AppRouter.router
                   .routeInformationProvider,
-              routeInformationParser: AppRouter.router.routeInformationParser,
+              routeInformationParser: AppRouter.router
+                  .routeInformationParser,
               routerDelegate: AppRouter.router.routerDelegate,
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

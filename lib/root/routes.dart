@@ -18,7 +18,7 @@ class AppRouter {
           BuildContext context, GoRouterState state) =>
       MaterialPage(
         key: state.pageKey,
-        child: const MoviesPage(),
+        child: MoviesPage(),
       );
 
   static MaterialPage _movieDetailPageRouteBuilder(

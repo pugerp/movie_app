@@ -9,7 +9,7 @@ import '../models/movie/movie.dart';
 import '../models/paging/paging_response.dart';
 
 abstract class MovieRepository {
-  Future<Either<Failure, PagingResponse<Movie>>> fetchMovies();
+  Future<Either<Failure, PagingResponse<Movie>>> fetchMovies({required int page});
 }
 
 @LazySingleton(as: MovieRepository)
@@ -19,9 +19,9 @@ class MovieRepositoryImpl extends MovieRepository {
   MovieRepositoryImpl({required this.remoteDatasource});
 
   @override
-  Future<Either<Failure, PagingResponse<Movie>>> fetchMovies() async {
+  Future<Either<Failure, PagingResponse<Movie>>> fetchMovies({required int page}) async {
     try {
-      final response = await remoteDatasource.movies(page: 1, adults: false, includeVideo: false, lng: 'en-US');
+      final response = await remoteDatasource.movies(page: page, adults: false, includeVideo: false, lng: 'en-US');
       return Right(response);
     } on DioException catch (e) {
       final errorMessage = CustomException.fromDioError(e).message;

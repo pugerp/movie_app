@@ -26,7 +26,14 @@ class MovieRemoteDatasourceImpl extends MovieRemoteDatasource {
       required bool adults,
       required bool includeVideo,
       required String lng}) async {
-    final response = await provider.get('discover/movie');
+    var params = {
+      'page': page,
+      'include_adults': false,
+      'include_video': false,
+      'language': 'en-US'
+    };
+
+    final response = await provider.get('discover/movie', queryParameters: params);
 
     if (response.statusCode == 200) {
       final result = PagingResponse.fromJson(response.data,
